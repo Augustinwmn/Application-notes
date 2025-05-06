@@ -101,7 +101,9 @@ function ajouter_note_existant(noteData) {
     };
 }
 
-document.body.ondblclick = ajouter_note;
+document.body.ondblclick = function (e) {
+    ajouter_note(event.clientX - 50, event.clientY - 20);
+};
 
 function delete_note() {
     const confirm = window.confirm('Vous voulez vraiment supprimer cette note ?');

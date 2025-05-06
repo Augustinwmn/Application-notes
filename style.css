@@ -1,0 +1,81 @@
+body, html{
+    margin: 0;
+    height: 100%;
+}
+header{
+    background-color: rgb(240, 240, 240);
+    box-shadow: #cccccc 0px 1px; 
+    /* height: 20px; */
+}
+#style{
+    background: none;
+    border: none;
+    color: black;
+    width: 35px;
+    height: 35px;
+    font-size: 20px;
+    padding: 5px;
+}
+#style:hover{
+    color: rgb(0, 0, 255);
+    background-color: rgb(201, 201, 201);
+    border-radius: 20px;
+    cursor: pointer;
+}
+.fenetre{
+    background-color: rgb(240, 240, 240);
+    margin: 5px;
+    border: 1px solid #000;
+    width: 300px; 
+    box-shadow: #cccccc 3px 3px 1px; 
+    /* height: 300px; */
+    /* max-height: 500px; */
+    aspect-ratio: 1/1;
+    position: fixed;
+    /* On pourra faire evoluer des propriété left et top via js */
+} 
+.fenetre .barre-de-titre{
+    border-bottom: 1px solid #000;
+    background-color: rgb(170, 170, 170);
+    width: 100%;
+    /* height: 20px; */
+    display: flex;
+    justify-content: end;
+    /* padding: 5px;
+    box-sizing: border-box; */
+    
+}
+.fenetre .barre-de-titre span{
+    flex-grow: 1;
+    padding: 5px;
+    box-sizing: border-box;
+}
+.fenetre .barre-de-titre button.bouton-fermer{
+    background-color: white;
+    user-select: none;
+    border: none;
+    aspect-ratio: 1/1;
+}
+.fenetre .barre-de-titre button.bouton-fermer:hover{
+    background-color: rgba(255, 30, 30, 0.6);
+    color: white;
+}
+.fenetre textarea{
+    margin: 0;
+    padding: 5px;
+    min-height: 290px;
+    max-height: 500px;
+    width: 100%;
+    background-color: transparent;
+
+    border: none;
+    outline: none;
+    resize: vertical;
+    box-sizing: border-box;
+    vertical-align: middle;
+    aspect-ratio: 1/1;
+}
+.fenetre textarea:active, .fenetre textarea:focus{
+    outline: none;
+
+}

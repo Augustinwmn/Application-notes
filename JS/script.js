@@ -1,12 +1,15 @@
-jQuery(document).ready(function () {
-    jQuery.ajax("./php/traitement_initialisation_notes.php", {
-        success: function (data) {
-            console.log(data);
+$.ajax("./php/script_traitement/traitement_initialisation_notes.php", {
+    success: function (data) {
+
+        let liste_notes = JSON.parse(data);
+
+        for (let note of liste_notes) {
+            ajouter_note(note.x, note.y, note.titre, note.content, note.id);
         }
-    });
+    }
 });
 
-function ajouter_note(x, y) {
+function ajouter_note(x, y, titre = "Titre de la note", contenu = "", id = false) {
     //Approche 1 : écrire du HTML
     // document.body.innerHTML += '<div class="note"><div class="barre-de-titre"><button>&times</button></div><textarea></textarea></div>';
     // Preparation d'une nouvelle div
@@ -18,20 +21,24 @@ function ajouter_note(x, y) {
     nouvelle_note.className = "fenetre";
     nouvelle_note.style.left = x + "px";
     nouvelle_note.style.top = y + "px";
+    nouvelle_note.stopPropagation = function (event) {
+        event.stopPropagation();
+    };
 
     //Chaque élément enfant de notre note pourra être considéré comme une propriété de celle-ci, ce qui facilitera l'accès à ces élément depuis la note(En plus d'être assez élégant dans le concept). La note n'est plus un simple élément HTML mais un objet personnalisé. 
 
     //Barre de titre :
     nouvelle_note.barre_de_titre = document.createElement("div");
+
     nouvelle_note.appendChild(nouvelle_note.barre_de_titre);
     nouvelle_note.barre_de_titre.className = "barre-de-titre";
 
     // Titre de la note :
     nouvelle_note.titre = document.createElement("span");
-    // nouvelle_note.titre.type = "text";
-    // nouvelle_note.titre.className = "titre-note";
+    nouvelle_note.titre.setAttribute("contenteditable", "true");
+    nouvelle_note.titre.className = "titre-note";
     nouvelle_note.barre_de_titre.appendChild(nouvelle_note.titre);
-    // nouvelle_note.titre.textContent = "Titre de la note";
+    nouvelle_note.titre.textContent = titre;
 
     // Bouton de supression 
     nouvelle_note.bouton_supression = document.createElement("button");
@@ -42,6 +49,9 @@ function ajouter_note(x, y) {
     //Champ texte :
     nouvelle_note.champ = document.createElement("textarea");
     nouvelle_note.appendChild(nouvelle_note.champ);
+    nouvelle_note.champ.placeholder = "Contenu de la note";
+    nouvelle_note.champ.value = contenu;
+
 
 
     // Gestion glisser-déposer
@@ -55,7 +65,7 @@ function ajouter_note(x, y) {
         }
     });
 
-    nouvelle_note.id_bdd = false; // On initialise l'id de la note à null, il sera mis à jour lors de la sauvegarde
+    nouvelle_note.id_bdd = id;
 
     //Méthodes
 
@@ -66,11 +76,11 @@ function ajouter_note(x, y) {
         // - si la note existe déjà, mettre à jour la ligne qui lui correspond (incluant titre, content, x, y)
 
         if (!nouvelle_note.id_bdd) {
-            var url_script_php = "./php/traitement_ajout_note.php";
+            var url_script_php = "./php/script_traitement/traitement_ajout_note.php";
         }
         else {
             // On met à jour la note dans la BDD
-            var url_script_php = "./php/traitement_updated_note.php";
+            var url_script_php = "./php/script_traitement/traitement_updated_note.php";
         }
 
         console.log("Sauvegarde de la note : " + nouvelle_note.champ.value);
@@ -97,24 +107,33 @@ function ajouter_note(x, y) {
 
     };
 
-    // Déclancheur de sauvegarde automatique
+    nouvelle_note.supprimer = function () {
+        const confirmer = confirm('Vous voulez vraiment supprimer cette note ?');
+        if (confirmer) {
 
-    nouvelle_note.champ.addEventListener("blur", nouvelle_note.sauvegarder);
-    // + au glisser-déposer : voir ci-dessus
+            $.ajax("./php/script_traitement/traitement_delete_note.php", {
+                type: "POST",
+                data: {
+                    id: nouvelle_note.id_bdd
+                },
+                success: function (data) {
+                    console.log("Note supprimée : " + nouvelle_note.id_bdd);
+                },
+            });
 
-
-
-
-    nouvelle_note.bouton_supression.onclick = function () {
-        //Supprimer la note
-        const confirm = window.confirm('Vous voulez vraiment supprimer cette note ?');
-        if (confirm) {
-            document.body.removeChild(nouvelle_note);
+            nouvelle_note.remove();
         }
     };
 
-}
+    // Déclancheur de sauvegarde automatique
+    nouvelle_note.champ.addEventListener("blur", nouvelle_note.sauvegarder);
 
+    // Declancheur de suppression de note
+    nouvelle_note.bouton_supression.addEventListener("click", nouvelle_note.supprimer);
+};
+
+
+// Declencheur de création de note
 document.body.addEventListener("dblclick", function (event) { ajouter_note(event.clientX - 50, event.clientY - 20); });
 
 // il faudrait que ces coordonées proviennent de l'événement dbonclick (car elle depend du curseur)

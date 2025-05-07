@@ -1,7 +1,7 @@
 <?php
 
-require("config.php");
-require("bdd.class.php");
+require("../config.php");
+require("../bdd.class.php");
 
 $bdd = new BDD();
 

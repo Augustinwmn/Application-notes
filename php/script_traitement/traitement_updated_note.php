@@ -19,8 +19,8 @@ if (isset($_POST["id"])
     $y = $_POST["y"];
     
 
-    require("config.php");
-    require("bdd.class.php");
+    require("../config.php");
+    require("../bdd.class.php");
     $bdd = new BDD();
     $bdd->requete("UPDATE `notes` SET `titre` = ?, `content` = ?, `x` = ?, `y` = ? WHERE `notes`.`id` = ?", [$titre, $content, $x, $y , $id]);
 }

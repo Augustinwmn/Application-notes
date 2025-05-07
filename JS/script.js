@@ -1,3 +1,11 @@
+jQuery(document).ready(function () {
+    jQuery.ajax("./php/traitement_initialisation_notes.php", {
+        success: function (data) {
+            console.log(data);
+        }
+    });
+});
+
 function ajouter_note(x, y) {
     //Approche 1 : écrire du HTML
     // document.body.innerHTML += '<div class="note"><div class="barre-de-titre"><button>&times</button></div><textarea></textarea></div>';
@@ -20,6 +28,8 @@ function ajouter_note(x, y) {
 
     // Titre de la note :
     nouvelle_note.titre = document.createElement("span");
+    // nouvelle_note.titre.type = "text";
+    // nouvelle_note.titre.className = "titre-note";
     nouvelle_note.barre_de_titre.appendChild(nouvelle_note.titre);
     // nouvelle_note.titre.textContent = "Titre de la note";
 
@@ -45,6 +55,8 @@ function ajouter_note(x, y) {
         }
     });
 
+    nouvelle_note.id_bdd = false; // On initialise l'id de la note à null, il sera mis à jour lors de la sauvegarde
+
     //Méthodes
 
     nouvelle_note.sauvegarder = function () {
@@ -53,30 +65,41 @@ function ajouter_note(x, y) {
         // - si la note vien d'être créée, ajouter une ligne qui lui correspond dans la BDD (incluant titre, content, x, y)
         // - si la note existe déjà, mettre à jour la ligne qui lui correspond (incluant titre, content, x, y)
 
+        if (!nouvelle_note.id_bdd) {
+            var url_script_php = "./php/traitement_ajout_note.php";
+        }
+        else {
+            // On met à jour la note dans la BDD
+            var url_script_php = "./php/traitement_updated_note.php";
+        }
+
         console.log("Sauvegarde de la note : " + nouvelle_note.champ.value);
 
-        $.ajax({
-            url: "traitement_ajout_note.php",
+        $.ajax(url_script_php, {
             type: "POST",
             data: {
+                id: nouvelle_note.id_bdd,
                 titre: nouvelle_note.titre.textContent,
                 content: nouvelle_note.champ.value,
                 x: nouvelle_note.style.left,
                 y: nouvelle_note.style.top
             },
-            success: function (response) {
-                console.log("Sauvegarde réussie : " + response);
+            success: function (data) {
+
+                if (!nouvelle_note.id_bdd) {
+                    nouvelle_note.id_bdd = data;
+                    // On récupère l'id de la note dans la BDD
+
+                    console.log("Nouvelle note créée avec l'id : " + nouvelle_note.id_bdd);
+                }
             },
-            error: function (xhr, status, error) {
-                console.error("Erreur de sauvegarde : " + error);
-            }
         });
 
     };
 
     // Déclancheur de sauvegarde automatique
 
-    nouvelle_note.champ.addEventListener("input", nouvelle_note.sauvegarder);
+    nouvelle_note.champ.addEventListener("blur", nouvelle_note.sauvegarder);
     // + au glisser-déposer : voir ci-dessus
 
 

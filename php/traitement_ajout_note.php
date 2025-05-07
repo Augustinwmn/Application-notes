@@ -2,30 +2,20 @@
 
 // A modifier : valeur à chercher dans le tableau $_POST
 
-require("config.php");
+if (isset($_POST["titre"]) && isset($_POST["content"]) && isset($_POST["x"]) && isset($_POST["y"]) && (trim($_POST["titre"]) != "" || trim($_POST["content"]) != "")) {
 
-
-if (isset($_POST["title"]) && isset($_POST["content"]) && trim($_POST["title"]) != "" && trim($_POST["content"]) != "") {
-
-    // A mettre à jour
-    $title = $_POST["title"];
+    $titre = $_POST["titre"];
     $content = $_POST["content"];
-    /*
-        //On établit la connexion
-        $connexion = new PDO("mysql:host=" . SERVERNAME . ";dbname=" . DBNAME, USERNAME, PASSWORD);
+    $x = $_POST["x"];
+    $y = $_POST["y"];
+    
 
-        // On écrit la requête à envoyer
-        $requete = "INSERT INTO `pages` (`id`, `titre`, `contenu`) VALUES (NULL, ?, ?)";
-
-        // On prépare puis exécute la requête (envoi vers la BDD)
-        $preparation = $connexion->prepare($requete);
-        $preparation->execute([$title, $content]);// Le tableau en paramètre contient, dans le bon ordre des valeurs qui remplaçeront les "?" dans notre schéma de requête
-
-    */
+    require("config.php");
     require("bdd.class.php");
     $bdd = new BDD();
-    $bdd->requete("INSERT INTO `notes` (`id`, `titre`, `content`, `x`, `y`) VALUES (NULL, ?, ?, ?, ?)", [$title, $content]);
+    $bdd->requete("INSERT INTO `notes` (`id`, `titre`, `content`, `x`, `y`) VALUES (NULL, ?, ?, ?, ?)", [$titre, $content, $x, $y]);
 }
 
-// header("Location: ./index.html");
+echo $bdd->requete("SELECT MAX(`id`) FROM `notes` ")[0]['MAX(`id`)']; // Retourne l'id de la dernière note insérée
+
 ?>
